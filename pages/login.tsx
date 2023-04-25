@@ -1,7 +1,4 @@
-import Image from 'next/image';
-import { Inter } from 'next/font/google';
 import { useState } from 'react';
-import { login } from '@/utils';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 
