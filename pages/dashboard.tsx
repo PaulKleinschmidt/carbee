@@ -1,5 +1,8 @@
+import { Appointments } from '@/schemas/appointments';
+import { Availability } from '@/schemas/availability';
 import { getToken } from 'next-auth/jwt';
 import { GetServerSidePropsContext } from 'next/types';
+import { z } from 'zod';
 
 export default function Dashboard() {
   return (
@@ -15,10 +18,10 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
     secret: process.env.JWT_SECRET,
   });
 
-  if (token?.access_token) {
+  if (token?.accessToken) {
     const options = {
       headers: {
-        Authorization: 'Bearer ' + token?.access_token,
+        Authorization: 'Bearer ' + token?.accessToken,
         'Content-Type': 'application/json',
       },
     };
@@ -41,9 +44,27 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
       availabilityRes.json(),
     ]);
 
-    return { props: { appointments, availability } };
+    const parsed = z
+      .object({ availability: Availability, appointments: Appointments })
+      .safeParse({ availability, appointments });
+
+    if (parsed.success) {
+      return {
+        props: {
+          appointments: parsed.data.appointments,
+          availability: parsed.data.availability,
+        },
+      };
+    } else {
+      console.error(parsed.error);
+
+      return {
+        redirect: {
+          destination: '/500',
+        },
+      };
+    }
   } else {
-    // Redirect users to sign in page if they are not signed in
     return {
       redirect: {
         permanent: false,

@@ -35,7 +35,7 @@ export default NextAuth({
       if (account && user) {
         return {
           ...token,
-          access_token: user.accessToken,
+          accessToken: user.accessToken,
         };
       }
       return token;
