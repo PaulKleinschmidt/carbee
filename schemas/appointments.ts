@@ -1,3 +1,4 @@
+import App from 'next/app';
 import { z } from 'zod';
 
 const WorkOrderDto = z.object({
@@ -10,16 +11,18 @@ const WorkOrderDto = z.object({
   cancelTime: z.string().optional(),
 });
 
-export const Appointments = z.array(
-  z.object({
-    id: z.string(),
-    userId: z.number(),
-    duration: z.number(),
-    scheduledTime: z.string(),
-    workOrderDto: WorkOrderDto,
-    status: z.enum(['SCHEDULED', 'PAID', 'COMPLETE', 'IN_PROGRESS']),
-    completeTime: z.string().optional(),
-    paymentId: z.string().optional(),
-    cancelTime: z.string().optional(),
-  })
-);
+const Appointment = z.object({
+  id: z.string(),
+  userId: z.string(),
+  duration: z.number(),
+  scheduledTime: z.string(),
+  workOrderDto: WorkOrderDto,
+  status: z.enum(['SCHEDULED', 'PAID', 'COMPLETE', 'IN_PROGRESS']),
+  completeTime: z.string().optional(),
+  paymentId: z.string().optional(),
+  cancelTime: z.string().optional(),
+});
+
+export const Appointments = z.array(Appointment);
+
+export type TAppointment = z.infer<typeof Appointment>;
