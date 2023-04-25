@@ -2,20 +2,29 @@ import Image from 'next/image';
 import { Inter } from 'next/font/google';
 import { useState } from 'react';
 import { login } from '@/utils';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/router';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<boolean>(false);
+  const router = useRouter();
 
-  const onLogin = (e: React.FormEvent) => {
+  const onLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(false);
-    login(username, password)
-      .then((s) => {
-        console.log('TODO: Redirect to /dashboard');
-      })
-      .catch((e) => setError(true));
+    const result = await signIn('credentials', {
+      redirect: false,
+      username: username,
+      password: password,
+    });
+
+    if (result?.error) {
+      setError(true);
+    } else {
+      router.push('/dashboard');
+    }
   };
 
   return (

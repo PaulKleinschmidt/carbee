@@ -1,8 +1,12 @@
 export const login = async (
   username: string,
   password: string
-): Promise<{ accessToken: string }> => {
-  return fetch('/api/auth/login', {
+): Promise<{
+  current_user: any;
+  access_token: any;
+  accessToken: string;
+}> => {
+  return fetch('/api/auth/signin', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
