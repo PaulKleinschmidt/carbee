@@ -1,7 +1,10 @@
 import { Appointment } from '@/components/Appointment';
-import { Appointments } from '@/schemas/appointments';
-import { Availability } from '@/schemas/availability';
+import { AvailabilityView } from '@/components/AvailabilityView';
+import { Appointments, TAppointment } from '@/schemas/appointments';
+import { Availability, TAvailability } from '@/schemas/availability';
 import { getAppointments } from '@/utils/api/getAppointments';
+import { getAvailability } from '@/utils/api/getAvailability';
+import { initialAvailabilityDate } from '@/utils/initialAvailabilityDate';
 import { getToken } from 'next-auth/jwt';
 import { getCsrfToken, getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
@@ -12,15 +15,20 @@ import {
 import { useState } from 'react';
 import { z } from 'zod';
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = 3;
 
 export default function Dashboard({
   initialAppointments,
-  availability,
+  initialAvailability,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const [appointments, setAppointments] = useState(initialAppointments);
+  const [appointments, setAppointments] =
+    useState<TAppointment[]>(initialAppointments);
+  const [availability, setAvailability] =
+    useState<TAvailability>(initialAvailability);
+
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(initialAvailabilityDate());
   const router = useRouter();
 
   const onPaginationClick = (page: number) => {
@@ -40,13 +48,29 @@ export default function Dashboard({
       });
   };
 
+  const onDateChange = (date: string) => {
+    setSelectedDate(date);
+    getAvailability(date)
+      .then((availability) => {
+        console.log('availability', availability);
+        setAvailability(availability);
+      })
+      .catch((res) => {
+        if (res.status === 401) {
+          router.push('/login');
+        } else {
+          setError(true);
+        }
+      });
+  };
+
   return (
     <main className="flex min-h-screen flex-col text-font-color-primary p-8 bg-background-color-body mx-auto max-w-full md:max-w-6xl md:p-24">
       <h1 className="text-3xl mb-4">Dashboard</h1>
 
       <h2 className="text-2xl mb-2">Appointments</h2>
       {appointments.map((appointment) => {
-        return <Appointment appointment={appointment} />;
+        return <Appointment key={appointment.id} appointment={appointment} />;
       })}
       <div className="text-center">
         <button
@@ -68,6 +92,12 @@ export default function Dashboard({
           Next
         </button>
       </div>
+      <h2 className="text-2xl mb-2">Availability</h2>
+      <AvailabilityView
+        onDateChange={onDateChange}
+        selectedDate={selectedDate}
+        times={availability.times}
+      />
     </main>
   );
 }
@@ -86,18 +116,15 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
       },
     };
 
-    // Get tomorrow's date in ISO format to pass to the /availability request
-    const date = new Date();
-    date.setDate(date.getDate() + 1);
-    const tomorrowISOString = date.toISOString().split('T')[0];
-
     const [appointmentsRes, availabilityRes] = await Promise.all([
       fetch(
         `${process.env.API_BASE_URL}/api/v1/appointments?page=0&size=${PAGE_SIZE}`,
         options
       ),
       fetch(
-        `${process.env.API_BASE_URL}/api/v1/availability/${tomorrowISOString}`,
+        `${
+          process.env.API_BASE_URL
+        }/api/v1/availability/${initialAvailabilityDate()}`,
         options
       ),
     ]);
@@ -117,7 +144,7 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
       return {
         props: {
           initialAppointments: parsed.data.appointments,
-          availability: parsed.data.availability,
+          initialAvailability: parsed.data.availability,
         },
       };
     } else {

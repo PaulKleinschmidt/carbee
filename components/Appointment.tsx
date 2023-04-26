@@ -1,6 +1,6 @@
 import { TAppointment } from '@/schemas/appointments';
-import { get12HourTime } from '@/utils/get12HourTime';
-import { getFormattedDate } from '@/utils/getFormattedDate';
+import { dateStringTo12HourTime } from '@/utils/dateStringTo12HourTime';
+import { formatDateString } from '@/utils/formatDateString';
 import { useEffect, useState } from 'react';
 
 type Props = {
@@ -15,14 +15,18 @@ export const Appointment = ({ appointment }: Props) => {
   // Dates need to be formatted inside useEffect to prevent React hydration errors
   // https://stackoverflow.com/a/73006128/9281222
   useEffect(() => {
-    setFormattedScheduledTime(getFormattedDate(appointment.scheduledTime));
+    setFormattedScheduledTime(formatDateString(appointment.scheduledTime));
 
     if (appointment.workOrderDto.startTime) {
-      setFormattedStartTime(get12HourTime(appointment.workOrderDto.startTime));
+      setFormattedStartTime(
+        dateStringTo12HourTime(appointment.workOrderDto.startTime)
+      );
     }
 
     if (appointment.completeTime) {
-      setFormattedCompletedTime(get12HourTime(appointment.completeTime));
+      setFormattedCompletedTime(
+        dateStringTo12HourTime(appointment.completeTime)
+      );
     }
   }, []);
 

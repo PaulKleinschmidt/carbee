@@ -1,4 +1,4 @@
-export const getFormattedDate = (dateString: string) => {
+export const formatDateString = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, {
     timeZone: 'UTC',
     month: 'long',
