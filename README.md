@@ -69,8 +69,9 @@ Nope!
 I spend about 5 hours total on this project. Most of the extra time was spent configuring next-auth, since I am new to the library. Here is a list of some enhancements I would add to this project, sorted by priority:
 
 - Since performance is important in this app, I would like to implement some caching for the client side requests. In the past I have used [React Query](https://tanstack.com/query/v3/) for this.
-- Add more auth features. As noted previously, I would add some sort of refresh tokens so users aren't forced to sign in when the JWT expires. I would also want to add logout, register, and single sign on functionality
-- Support different timezones for the availability section.
+- Add more auth functionality. As noted previously, I would add some sort of refresh tokens so users aren't forced to sign in when the JWT expires. I would also want to add logout, register, and single sign on functionality
+- Add the ability to modify, create, and delete appointments.
+- Support different timezones for the availability section, and format the times to 12 hour time.
 
 ## Screenshots
 
