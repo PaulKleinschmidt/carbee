@@ -1,6 +1,7 @@
 import { TAppointment } from '@/schemas/appointments';
 import { dateStringTo12HourTime } from '@/utils/dateStringTo12HourTime';
 import { formatDateString } from '@/utils/formatDateString';
+import { transformStatus } from '@/utils/transformStatus';
 import { useEffect, useState } from 'react';
 
 type Props = {
@@ -56,7 +57,7 @@ export const Appointment = ({ appointment }: Props) => {
         <div className="mb-4">{appointment.workOrderDto.service}</div>
 
         <div className="font-bold">Status</div>
-        <div>{appointment.workOrderDto.status}</div>
+        <div>{transformStatus(appointment.workOrderDto.status)}</div>
       </div>
     </div>
   );
