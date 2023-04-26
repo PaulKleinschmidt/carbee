@@ -37,7 +37,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 #### Did you run into any “gotchas” along the way? If so, what were they and how did you address them?
 
-Yes! Here's a few things I ran into:
+Yes. Here's a few things I ran into:
 
 - Pagination - One of the requirements of this project was to implement pagination for the appointment list view. The provided API didn't return any pagination values to indicate whether there were values on the next page or not. I ended up implementing my own `hasNextPage` flag to ensure good a pagination UX (see `utils/api/getAppointments.ts`)
 - React Hydration Error - I ran into a React hydration error that ocurred when trying to parse/format dates on the frontend. The solution for this was to do the date formatting inside of a `useEffect` instead of inside the jsx directly.
@@ -68,7 +68,12 @@ Nope!
 
 I spend about 5 hours total on this project. Most of the extra time was spent configuring next-auth, since I am new to the library. Here is a list of some enhancements I would add to this project, sorted by priority:
 
-- Add the ability to log out and register new users
 - Since performance is important in this app, I would like to implement some caching for the client side requests. In the past I have used [React Query](https://tanstack.com/query/v3/) for this.
-- As noted previously, I would add some sort of refresh tokens so users aren't forced to sign in when the JWT expires.
+- Add more auth features. As noted previously, I would add some sort of refresh tokens so users aren't forced to sign in when the JWT expires. I would also want to add logout, register, and single sign on functionality
 - Support different timezones for the availability section.
+
+## Screenshots
+
+<img width="467" alt="Screen Shot 2023-04-26 at 10 41 43 AM" src="https://user-images.githubusercontent.com/32469657/234659333-df424906-f8e6-4f2b-9920-b74edef2ae28.png">
+<img width="604" alt="Screen Shot 2023-04-26 at 10 42 02 AM" src="https://user-images.githubusercontent.com/32469657/234659340-16a72816-6bb0-4365-80bd-f0249f92fd8c.png">
+<img width="1311" alt="Screen Shot 2023-04-26 at 10 41 29 AM" src="https://user-images.githubusercontent.com/32469657/234659343-a00133b5-fa5d-460b-8756-b6065cba7c12.png">
