@@ -12,9 +12,10 @@ export const PaginationControls = ({
   hasNextPage,
 }: Props) => {
   const buttonClass =
-    'mx-1 px-2 rounded-lg shadow-lg bg-brand-secondary-400 text-background-color-body';
+    'mx-1 bg-brand-secondary-400 text-background-color-body rounded-sm shadow-lg p-1 transition-all';
   const disabledClass =
     'bg-gray-300 text-background-color-body cursor-not-allowed';
+
   return (
     <div className="text-center">
       <button

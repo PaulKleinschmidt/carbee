@@ -21,6 +21,7 @@ export const AvailabilityView = ({
         <input
           type="date"
           id="date"
+          className="border-2 border-brand-secondary-400 rounded-sm mb-4"
           value={selectedDate}
           onChange={(e) => {
             onDateChange(e.target.value);
@@ -28,11 +29,11 @@ export const AvailabilityView = ({
           min={initialAvailabilityDate()}
         ></input>
       </div>
-      <div className="mb-4 max-h-64 overflow-y-scroll ">
+      <ul className="mb-4 max-h-64 overflow-y-scroll list-disc list-inside">
         {times.map((time) => (
-          <div key={time}>{time}</div>
+          <li key={time}>{time}</li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
