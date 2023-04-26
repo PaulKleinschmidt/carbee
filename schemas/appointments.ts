@@ -1,4 +1,3 @@
-import App from 'next/app';
 import { z } from 'zod';
 
 const WorkOrderDto = z.object({

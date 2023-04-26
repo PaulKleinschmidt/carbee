@@ -1,5 +1,6 @@
 import { TAppointment } from '@/schemas/appointments';
 
+// Transforms status to a more readable string
 export const transformStatus = (
   status: TAppointment['workOrderDto']['status']
 ): 'Complete' | 'In Progress' | 'Paid' | 'Ready' => {
