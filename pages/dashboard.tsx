@@ -1,39 +1,44 @@
 import { Appointment } from '@/components/Appointment';
 import { AvailabilityView } from '@/components/AvailabilityView';
-import { Appointments, TAppointment } from '@/schemas/appointments';
-import { Availability, TAvailability } from '@/schemas/availability';
+import { PaginationControls } from '@/components/PaginationControls';
+import { TAppointment } from '@/schemas/appointments';
+import { TAvailability } from '@/schemas/availability';
 import { apiGet } from '@/utils/api/apiGet';
+import { getAppointments } from '@/utils/api/getAppointments';
+import { getAvailability } from '@/utils/api/getAvailability';
 import { initialAvailabilityDate } from '@/utils/initialAvailabilityDate';
 import { getToken } from 'next-auth/jwt';
-import { useRouter } from 'next/router';
 import {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next/types';
 import { useState } from 'react';
-import { z } from 'zod';
 
-const PAGE_SIZE = 2;
+const PAGE_SIZE = '2';
 
 export default function Dashboard({
   initialAppointments,
   initialAvailability,
+  initialHasNextPage,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [appointments, setAppointments] =
     useState<TAppointment[]>(initialAppointments);
   const [availability, setAvailability] =
     useState<TAvailability>(initialAvailability);
-
   const [currentPage, setCurrentPage] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
   const [error, setError] = useState(false);
   const [selectedDate, setSelectedDate] = useState(initialAvailabilityDate());
 
   const onPaginationClick = (page: number) => {
-    apiGet<TAppointment[]>(`/api/appointments?page=${page}&size=${PAGE_SIZE}`)
-      .then((appointments) => {
+    apiGet<{ appointments: TAppointment[]; hasNextPage: boolean }>(
+      `/api/appointments?page=${page}&size=${PAGE_SIZE}`
+    )
+      .then(({ appointments, hasNextPage }) => {
         if (appointments && appointments.length) {
           setAppointments(appointments);
           setCurrentPage(page);
+          setHasNextPage(hasNextPage);
         }
       })
       .catch(() => {
@@ -43,12 +48,11 @@ export default function Dashboard({
 
   const onDateChange = (date: string) => {
     setSelectedDate(date);
-    apiGet<TAvailability>(date)
+    apiGet<TAvailability>(`/api/availability?date=${date}`)
       .then((availability) => {
-        console.log('availability', availability);
         setAvailability(availability);
       })
-      .catch((res) => {
+      .catch(() => {
         setError(true);
       });
   };
@@ -61,26 +65,11 @@ export default function Dashboard({
       {appointments.map((appointment) => {
         return <Appointment key={appointment.id} appointment={appointment} />;
       })}
-      <div className="text-center">
-        <button
-          onClick={() => {
-            onPaginationClick(currentPage - 1);
-          }}
-          disabled={currentPage === 0}
-          className="mx-1 border-2 border-font-color-light-grey rounded-lg px-1 shadow-lg"
-        >
-          Prev
-        </button>
-        Page: {currentPage + 1}
-        <button
-          className="mx-1 border-2 border-font-color-light-grey rounded-lg px-1"
-          onClick={() => {
-            onPaginationClick(currentPage + 1);
-          }}
-        >
-          Next
-        </button>
-      </div>
+      <PaginationControls
+        currentPage={currentPage}
+        hasNextPage={hasNextPage}
+        onPaginationClick={(page) => onPaginationClick(page)}
+      />
       <h2 className="text-2xl mb-2">Availability</h2>
       <AvailabilityView
         onDateChange={onDateChange}
@@ -98,51 +87,29 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
   });
 
   if (token?.accessToken) {
-    const options = {
-      headers: {
-        Authorization: 'Bearer ' + token?.accessToken,
-        'Content-Type': 'application/json',
-      },
-    };
+    const availability = await getAvailability(
+      initialAvailabilityDate(),
+      token.accessToken
+    );
 
-    const [appointmentsRes, availabilityRes] = await Promise.all([
-      fetch(
-        `${process.env.API_BASE_URL}/api/v1/appointments?page=0&size=${PAGE_SIZE}`,
-        options
-      ),
-      fetch(
-        `${
-          process.env.API_BASE_URL
-        }/api/v1/availability/${initialAvailabilityDate()}`,
-        options
-      ),
-    ]);
+    const appointmentsData = await getAppointments(
+      '0',
+      PAGE_SIZE,
+      token.accessToken
+    );
 
-    const [appointments, availability] = await Promise.all([
-      appointmentsRes.json(),
-      availabilityRes.json(),
-    ]);
-
-    // safeParse returns either an object containing the successfully parsed data or an
-    // error object with details about the validation errors.
-    const parsed = z
-      .object({ availability: Availability, appointments: Appointments })
-      .safeParse({ availability, appointments });
-
-    if (parsed.success) {
+    if (availability && appointmentsData) {
       return {
         props: {
-          initialAppointments: parsed.data.appointments,
-          initialAvailability: parsed.data.availability,
+          initialAppointments: appointmentsData.appointments,
+          initialHasNextPage: appointmentsData.hasNextPage,
+          initialAvailability: availability,
         },
       };
     } else {
-      // Log the validation errors. Ideally this would be logged to an external error client like Sentry.
-      console.error(parsed.error);
-
       return {
         redirect: {
-          destination: '/500',
+          destination: '/400',
         },
       };
     }

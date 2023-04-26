@@ -14,7 +14,9 @@ export const AvailabilityView = ({
   return (
     <div>
       <div className="mb-4">
-        <label htmlFor="date">Select a Date</label>
+        <label htmlFor="date" className="mr-2">
+          Select a Date:
+        </label>
 
         <input
           type="date"

@@ -10,6 +10,8 @@ module.exports = {
       'font-color-primary': '#414141',
       'font-color-light-grey': '#5c5c5c',
       'background-color-body': '#fff',
+      'brand-secondary-400': '#004559',
+      'gray-300': '#a6a6a6',
     },
     extend: {
       backgroundImage: {
