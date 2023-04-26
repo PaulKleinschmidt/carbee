@@ -29,7 +29,11 @@ export const Appointment = ({ appointment }: Props) => {
         dateStringTo12HourTime(appointment.completeTime)
       );
     }
-  }, []);
+  }, [
+    appointment.completeTime,
+    appointment.workOrderDto.startTime,
+    appointment.scheduledTime,
+  ]);
 
   return (
     <div className="p-10 w-full border-2 border-font-color-primary mb-4 text-sm rounded-sm shadow-sm flex space-x-10">
