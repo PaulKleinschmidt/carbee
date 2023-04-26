@@ -56,8 +56,6 @@ I used [next-auth](https://next-auth.js.org/) to handle authentication. It was m
 3. Next Auth then creates its own JWT which is where the access token from the previous step gets stored. This value is stored in a httpOnly cookie that is not accessible on the client-side.
 4. For subsequent API requests, I'm grabbing the access token from the JWT and passing it to the modulith API in the request headers to authenticate the requests. If there is no JWT, then the user is not signed in and gets redirected to the `/login` page.
 
-I noticed that the JWT from the server expires after an amount of time. If I had more time to spend on this project, I would figure out how to sync that expiration time with next auth, but for now you just need to sign in again if the token expires.
-
 In my ideal authentication scenario, I would adopt a similar approach to what I have implemented in this project, which involves storing the JWT results in an httpOnly cookie. Additionally, I would want to support refresh tokens, single sign on, and two factor auth.
 
 #### Is there anything you’d like to share about your project prior to my evaluating it?

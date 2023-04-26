@@ -18,22 +18,18 @@ export default async function handler(
     secret: process.env.JWT_SECRET,
   });
 
-  if (token?.accessToken) {
-    const result = await getAppointments(
-      req.query.page,
-      req.query.size,
-      token.accessToken
-    );
+  const result = await getAppointments(
+    req.query.page,
+    req.query.size,
+    token?.accessToken
+  );
 
-    if (result) {
-      return res.status(200).json({
-        appointments: result.appointments,
-        hasNextPage: result.hasNextPage,
-      });
-    } else {
-      return res.status(400).json({ error: 'Failed to fetch data' });
-    }
+  if (result.status === 200 && result.appointments) {
+    return res.status(200).json({
+      appointments: result.appointments,
+      hasNextPage: result.hasNextPage,
+    });
   } else {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(result.status).json({ error: 'Failed to fetch data' });
   }
 }

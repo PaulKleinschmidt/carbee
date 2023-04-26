@@ -18,18 +18,11 @@ export default async function handler(
     secret: process.env.JWT_SECRET,
   });
 
-  if (token?.accessToken) {
-    const availability = await getAvailability(
-      req.query.date,
-      token.accessToken
-    );
+  const result = await getAvailability(req.query.date, token?.accessToken);
 
-    if (availability) {
-      return res.status(200).json(availability);
-    } else {
-      return res.status(400).json({ error: 'Failed to fetch data' });
-    }
+  if (result.availability && result.status === 200) {
+    return res.status(200).json(result.availability);
   } else {
-    return res.status(401).json({ error: 'Unauthorized' });
+    return res.status(result.status).json({ error: 'Failed to fetch data' });
   }
 }

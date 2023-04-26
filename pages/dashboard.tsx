@@ -95,38 +95,39 @@ export async function getServerSideProps({ req }: GetServerSidePropsContext) {
     secret: process.env.JWT_SECRET,
   });
 
-  if (token?.accessToken) {
-    const availability = await getAvailability(
-      initialAvailabilityDate(),
-      token.accessToken
-    );
+  const availabilityData = await getAvailability(
+    initialAvailabilityDate(),
+    token?.accessToken
+  );
 
-    const appointmentsData = await getAppointments(
-      '0',
-      PAGE_SIZE,
-      token.accessToken
-    );
+  const appointmentsData = await getAppointments(
+    '0',
+    PAGE_SIZE,
+    token?.accessToken
+  );
 
-    if (availability && appointmentsData) {
-      return {
-        props: {
-          initialAppointments: appointmentsData.appointments,
-          initialHasNextPage: appointmentsData.hasNextPage,
-          initialAvailability: availability,
-        },
-      };
-    } else {
-      return {
-        redirect: {
-          destination: '/400',
-        },
-      };
-    }
-  } else {
+  if (availabilityData.availability && appointmentsData.appointments) {
+    return {
+      props: {
+        initialAppointments: appointmentsData.appointments,
+        initialHasNextPage: appointmentsData.hasNextPage,
+        initialAvailability: availabilityData.availability,
+      },
+    };
+  } else if (
+    availabilityData.status === 401 ||
+    appointmentsData.status === 401
+  ) {
     return {
       redirect: {
         permanent: false,
         destination: '/login',
+      },
+    };
+  } else {
+    return {
+      redirect: {
+        destination: '/400',
       },
     };
   }
