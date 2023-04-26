@@ -32,9 +32,9 @@ export default async function handler(
         hasNextPage: result.hasNextPage,
       });
     } else {
-      return res.status(400);
+      return res.status(400).json({ error: 'Failed to fetch data' });
     }
   } else {
-    return res.status(401);
+    return res.status(401).json({ error: 'error' });
   }
 }

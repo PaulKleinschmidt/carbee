@@ -2,18 +2,19 @@ import { useState } from 'react';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import cx from 'classnames';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { errorToast } from '@/utils/toasts';
 
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<boolean>(false);
   const router = useRouter();
   const disabled = !username || !password || submitting;
 
   const onLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(false);
     setSubmitting(true);
 
     const result = await signIn('credentials', {
@@ -23,8 +24,8 @@ export default function Login() {
     });
 
     if (result?.error) {
-      setError(true);
       setSubmitting(false);
+      errorToast('Invalid credentials. Please try again.');
     } else {
       router.push('/dashboard');
     }
@@ -59,6 +60,7 @@ export default function Login() {
           Submit
         </button>
       </form>
+      <ToastContainer />
     </main>
   );
 }

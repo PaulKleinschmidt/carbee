@@ -7,12 +7,15 @@ import { apiGet } from '@/utils/api/apiGet';
 import { getAppointments } from '@/utils/api/getAppointments';
 import { getAvailability } from '@/utils/api/getAvailability';
 import { initialAvailabilityDate } from '@/utils/initialAvailabilityDate';
+import { errorToast } from '@/utils/toasts';
 import { getToken } from 'next-auth/jwt';
 import {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
 } from 'next/types';
 import { useState } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const PAGE_SIZE = '2';
 
@@ -27,7 +30,6 @@ export default function Dashboard({
     useState<TAvailability>(initialAvailability);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
-  const [error, setError] = useState(false);
   const [selectedDate, setSelectedDate] = useState(initialAvailabilityDate());
 
   const onPaginationClick = (page: number) => {
@@ -42,7 +44,7 @@ export default function Dashboard({
         }
       })
       .catch(() => {
-        setError(true);
+        errorToast('Error getting appointments');
       });
   };
 
@@ -53,7 +55,7 @@ export default function Dashboard({
         setAvailability(availability);
       })
       .catch(() => {
-        setError(true);
+        errorToast('Error getting availability');
       });
   };
 
@@ -76,6 +78,7 @@ export default function Dashboard({
         selectedDate={selectedDate}
         times={availability.times}
       />
+      <ToastContainer />
     </main>
   );
 }
