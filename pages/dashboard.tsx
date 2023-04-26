@@ -2,11 +2,9 @@ import { Appointment } from '@/components/Appointment';
 import { AvailabilityView } from '@/components/AvailabilityView';
 import { Appointments, TAppointment } from '@/schemas/appointments';
 import { Availability, TAvailability } from '@/schemas/availability';
-import { getAppointments } from '@/utils/api/getAppointments';
-import { getAvailability } from '@/utils/api/getAvailability';
+import { apiGet } from '@/utils/api/apiGet';
 import { initialAvailabilityDate } from '@/utils/initialAvailabilityDate';
 import { getToken } from 'next-auth/jwt';
-import { getCsrfToken, getSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import {
   GetServerSidePropsContext,
@@ -15,7 +13,7 @@ import {
 import { useState } from 'react';
 import { z } from 'zod';
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 2;
 
 export default function Dashboard({
   initialAppointments,
@@ -29,38 +27,29 @@ export default function Dashboard({
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(false);
   const [selectedDate, setSelectedDate] = useState(initialAvailabilityDate());
-  const router = useRouter();
 
   const onPaginationClick = (page: number) => {
-    getAppointments(page, PAGE_SIZE)
+    apiGet<TAppointment[]>(`/api/appointments?page=${page}&size=${PAGE_SIZE}`)
       .then((appointments) => {
         if (appointments && appointments.length) {
           setAppointments(appointments);
           setCurrentPage(page);
         }
       })
-      .catch((res) => {
-        if (res.status === 401) {
-          router.push('/login');
-        } else {
-          setError(true);
-        }
+      .catch(() => {
+        setError(true);
       });
   };
 
   const onDateChange = (date: string) => {
     setSelectedDate(date);
-    getAvailability(date)
+    apiGet<TAvailability>(date)
       .then((availability) => {
         console.log('availability', availability);
         setAvailability(availability);
       })
       .catch((res) => {
-        if (res.status === 401) {
-          router.push('/login');
-        } else {
-          setError(true);
-        }
+        setError(true);
       });
   };
 
