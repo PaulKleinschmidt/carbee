@@ -1,6 +1,4 @@
-// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { Appointments, TAppointment } from '@/schemas/appointments';
-import { Availability, TAvailability } from '@/schemas/availability';
+import { TAvailability } from '@/schemas/availability';
 import { getAvailability } from '@/utils/api/getAvailability';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getToken } from 'next-auth/jwt';
