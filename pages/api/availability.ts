@@ -30,6 +30,6 @@ export default async function handler(
       return res.status(400).json({ error: 'Failed to fetch data' });
     }
   } else {
-    return res.status(401);
+    return res.status(401).json({ error: 'Unauthorized' });
   }
 }

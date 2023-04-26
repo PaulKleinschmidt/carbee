@@ -4,12 +4,14 @@ type Props = {
   times: string[];
   selectedDate: string;
   onDateChange(date: string): void;
+  loading: boolean;
 };
 
 export const AvailabilityView = ({
   times,
   selectedDate,
   onDateChange,
+  loading,
 }: Props) => {
   return (
     <div>
@@ -29,11 +31,15 @@ export const AvailabilityView = ({
           min={initialAvailabilityDate()}
         ></input>
       </div>
-      <ul className="mb-4 max-h-64 overflow-y-scroll list-disc list-inside">
-        {times.map((time) => (
-          <li key={time}>{time}</li>
-        ))}
-      </ul>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <ul className="mb-4 max-h-64 overflow-y-scroll list-disc list-inside">
+          {times.map((time) => (
+            <li key={time}>{time}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };

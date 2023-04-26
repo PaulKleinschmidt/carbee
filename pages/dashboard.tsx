@@ -30,6 +30,7 @@ export default function Dashboard({
     useState<TAvailability>(initialAvailability);
   const [currentPage, setCurrentPage] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(initialHasNextPage);
+  const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [selectedDate, setSelectedDate] = useState(initialAvailabilityDate());
 
   const onPaginationClick = (page: number) => {
@@ -50,12 +51,16 @@ export default function Dashboard({
 
   const onDateChange = (date: string) => {
     setSelectedDate(date);
+    setLoadingAvailability(true);
     apiGet<TAvailability>(`/api/availability?date=${date}`)
       .then((availability) => {
         setAvailability(availability);
       })
       .catch(() => {
         errorToast('Error getting availability');
+      })
+      .finally(() => {
+        setLoadingAvailability(false);
       });
   };
 
@@ -74,6 +79,7 @@ export default function Dashboard({
       />
       <h2 className="text-2xl mb-2">Availability</h2>
       <AvailabilityView
+        loading={loadingAvailability}
         onDateChange={onDateChange}
         selectedDate={selectedDate}
         times={availability.times}
